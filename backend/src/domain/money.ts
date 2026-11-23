@@ -16,14 +16,18 @@ export interface ConversionResult {
   amountGtqCents: bigint;
 }
 
-export function parseAmountToCents(raw: string): bigint {
+export function parseNonNegativeAmountToCents(raw: string): bigint {
   if (!AMOUNT_REGEX.test(raw)) {
     throw new Error("Formato de monto inválido");
   }
 
   const [wholePart = "0", fracPart = ""] = raw.split(".");
   const centsPart = fracPart.padEnd(2, "0");
-  const cents = BigInt(wholePart) * 100n + BigInt(centsPart);
+  return BigInt(wholePart) * 100n + BigInt(centsPart);
+}
+
+export function parseAmountToCents(raw: string): bigint {
+  const cents = parseNonNegativeAmountToCents(raw);
 
   if (cents <= 0n) {
     throw new Error("El monto debe ser mayor a cero");
